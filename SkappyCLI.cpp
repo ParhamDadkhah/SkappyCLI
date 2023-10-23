@@ -38,18 +38,13 @@ int main()
 	std::string path;
 	std::cout << "gib path: ";
 	std::cin >> path;
-	char* contents;
-	std::ifstream inputfile(path);
-	char c;
+	std::ifstream inputfile(path, std::ifstream::binary);
 	while (inputfile.good())
 	{
-		std::streambuf* bufferptr = inputfile.rdbuf();
-		std::streamsize  buffersize = 1024;
-		contents = new char[buffersize];
-		int size = bufferptr->sgetn(contents, buffersize);
-		//std::cout << size;
-		std::cout.write(contents, buffersize);
-		inputfile.get(c);
+		char block[1024];
+		std::streamsize length = 1024;
+		inputfile.read(block, length);
+		std::cout.write(block, inputfile.gcount());
 	}
 	inputfile.close();
 	return 0;
