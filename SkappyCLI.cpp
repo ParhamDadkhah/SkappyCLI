@@ -1,6 +1,6 @@
 #include <iostream>
 #include <cryptopp/sha.h>
-
+#include <fstream>
 std::string GenerateKey(std::string PassPhrase);
 void BeginEncrypt();
 void BeginDecrypt();
@@ -14,12 +14,13 @@ void PrintWelcome()
 }
 int main()
 {
+	/*
 	int Option;
 	do
 	{
 		PrintWelcome();
 		std::cin >> Option;
-	} while (Option <= 3 && Option >= 0);
+	} while (Option > 3 && Option < 0);
 
 	switch (Option)
 	{
@@ -33,5 +34,23 @@ int main()
 			return 0;
 			break;
 	}
+	*/
+	std::string path;
+	std::cout << "gib path: ";
+	std::cin >> path;
+	char* contents;
+	std::ifstream inputfile(path);
+	char c;
+	while (inputfile.good())
+	{
+		std::streambuf* bufferptr = inputfile.rdbuf();
+		std::streamsize  buffersize = 1024;
+		contents = new char[buffersize];
+		int size = bufferptr->sgetn(contents, buffersize);
+		//std::cout << size;
+		std::cout.write(contents, buffersize);
+		inputfile.get(c);
+	}
+	inputfile.close();
 	return 0;
 }
