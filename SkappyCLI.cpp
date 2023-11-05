@@ -53,7 +53,6 @@ void WriteIvToFileBeginning(CryptoPP::SecByteBlock* Iv, std::ofstream* OutputFil
 	using namespace CryptoPP;
 	ArraySource(*Iv, Iv->size(), true, new FileSink(*OutputFile));
 }
-
 bool IsSkappyFile(std::string& Path)
 {
 	//https://www.techiedelight.com/extract-n-characters-from-the-end-of-a-string-in-cpp/
@@ -76,10 +75,10 @@ void BeginEncrypt()
 	
 	#ifndef DEBUG
 	std::string Path;
-	std::cout << "gib path: ";
+	std::cout << "Ok! Now drag and drop the file in here so i can encrypt it: ";
 	std::cin >> Path;
 	std::string Key;
-	std::cout << "gib key: ";
+	std::cout << "Now give me the password that you encrytped the file with: ";
 	std::cin >> Key;
 	#endif
 
@@ -114,11 +113,11 @@ void BeginDecrypt()
 	std::string Path;
 	do
 	{
-		std::cout << "gib path: ";
+		std::cout << "Ok! Now drag and drop the file in here so i can encrypt it: ";
 		std::cin >> Path;
 	} while (!IsSkappyFile(Path));
 	std::string Key;
-	std::cout << "gib key: ";
+	std::cout << "Now give me the password that you encrytped the file with: ";
 	std::cin >> Key;
 	#endif
 
@@ -154,7 +153,6 @@ void PrintWelcome()
 
 int main()
 {
-	/*
 	int Option;
 	do
 	{
@@ -174,8 +172,5 @@ int main()
 			return 0;
 			break;
 	}
-	*/
-	//BeginEncrypt();
-	BeginDecrypt();
 	return 0;
 }
