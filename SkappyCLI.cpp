@@ -31,7 +31,6 @@ std::string Path = "C:\\Users\\RSKALA\\Desktop\\salam.txt";
 std::string Key = "THISISAKEY";
 #endif // DEBUG
 
-
 CryptoPP::SecByteBlock GenerateKey(std::string PassPhrase)
 {
 	using namespace CryptoPP;
@@ -50,6 +49,11 @@ CryptoPP::SecByteBlock GenerateIv()
 	prng.GenerateBlock(Iv, Iv.size());
 	return Iv;
 }
+void WriteIvToFileBeginning(CryptoPP::SecByteBlock* Iv, std::ofstream* OutputFile)
+{
+	using namespace CryptoPP;
+	ArraySource(*Iv, Iv->size(), true, new FileSink(*OutputFile));
+}
 void BeginEncrypt()
 {
 	system("cls");
@@ -63,7 +67,27 @@ void BeginEncrypt()
 	std::cin >> Key;
 	#endif
 
+	using namespace CryptoPP;
+	SecByteBlock Iv = GenerateIv();
+	SecByteBlock KeyHashed = GenerateKey(Key);
+	
+	CFB_Mode<AES>::Encryption EncryptObj;
 
+	EncryptObj.SetKeyWithIV(KeyHashed, KeyHashed.size(), Iv);
+
+	std::ifstream InputFile(Path, std::ios_base::binary);
+	std::ofstream OutputFile(Path + ".skappy", std::ios_base::binary);
+	WriteIvToFileBeginning(&Iv, &OutputFile);
+	
+	FileSource Encryption(InputFile, false, new StreamTransformationFilter(EncryptObj, new FileSink(OutputFile)));
+	
+	while (!InputFile.eof() && !Encryption.SourceExhausted())
+	{
+		Encryption.Pump(1024);
+	}
+
+	OutputFile.close();
+	InputFile.close();
 
 }
 void BeginDecrypt();
