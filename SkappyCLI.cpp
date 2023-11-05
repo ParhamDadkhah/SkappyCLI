@@ -25,7 +25,7 @@ void loadfile()
 }
 */
 
-#define DEBUG
+//#define DEBUG
 #ifdef DEBUG
 std::string Path = "C:\\Users\\RSKALA\\Desktop\\salam.txt";
 std::string Key = "THISISAKEY";
@@ -40,7 +40,6 @@ CryptoPP::SecByteBlock GenerateKey(std::string PassPhrase)
 	SecByteBlock KeyHashed(reinterpret_cast<const byte*>(&Hash[0]), Hash.size());
 	return KeyHashed;
 }
-
 CryptoPP::SecByteBlock GenerateIv()
 {
 	using namespace CryptoPP;
@@ -53,6 +52,23 @@ void WriteIvToFileBeginning(CryptoPP::SecByteBlock* Iv, std::ofstream* OutputFil
 {
 	using namespace CryptoPP;
 	ArraySource(*Iv, Iv->size(), true, new FileSink(*OutputFile));
+}
+
+bool IsSkappyFile(std::string& Path)
+{
+	//https://www.techiedelight.com/extract-n-characters-from-the-end-of-a-string-in-cpp/
+	if (Path.size() < 7) {
+		return false;
+	}
+
+	if (Path.substr(Path.size() - 7) == ".skappy")
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 void BeginEncrypt()
 {
@@ -90,7 +106,42 @@ void BeginEncrypt()
 	InputFile.close();
 
 }
-void BeginDecrypt();
+void BeginDecrypt()
+{
+	system("cls");
+
+	#ifndef DEBUG
+	std::string Path;
+	do
+	{
+		std::cout << "gib path: ";
+		std::cin >> Path;
+	} while (!IsSkappyFile(Path));
+	std::string Key;
+	std::cout << "gib key: ";
+	std::cin >> Key;
+	#endif
+
+	using namespace CryptoPP;
+	SecByteBlock KeyHashed = GenerateKey(Key);
+	SecByteBlock Iv(AES::BLOCKSIZE);
+	
+	std::ifstream InputFile(Path, std::ios_base::binary);
+	std::ofstream OutputFile(Path.substr(0,Path.size() - 7), std::ios_base::binary);
+	InputFile.read((char*)& Iv[0], 16);
+
+	CFB_Mode<AES>::Decryption DecryptObj;
+
+	DecryptObj.SetKeyWithIV(KeyHashed, KeyHashed.size(), Iv);
+	FileSource Encryption(InputFile, false, new StreamTransformationFilter(DecryptObj, new FileSink(OutputFile)));
+	while (!InputFile.eof() && !Encryption.SourceExhausted())
+	{
+		Encryption.Pump(1024);
+	}
+
+	OutputFile.close();
+	InputFile.close();
+}
 
 
 void PrintWelcome()
@@ -124,7 +175,7 @@ int main()
 			break;
 	}
 	*/
-	BeginEncrypt();
-	
+	//BeginEncrypt();
+	BeginDecrypt();
 	return 0;
 }
