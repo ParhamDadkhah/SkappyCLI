@@ -7,6 +7,7 @@
 #include <cryptopp/files.h>
 #include <cryptopp/osrng.h>
 #include <cryptopp/hex.h>
+#include <chrono>
 /*
 void loadfile()
 {
@@ -78,10 +79,11 @@ void BeginEncrypt()
 	std::cout << "Ok! Now drag and drop the file in here so i can encrypt it: ";
 	std::cin >> Path;
 	std::string Key;
-	std::cout << "Now give me the password that you encrytped the file with: ";
+	std::cout << "Now give me the password that you want to encrypt the file with: ";
 	std::cin >> Key;
+	auto start = std::chrono::high_resolution_clock::now();
 	#endif
-
+	
 	using namespace CryptoPP;
 	SecByteBlock Iv = GenerateIv();
 	SecByteBlock KeyHashed = GenerateKey(Key);
@@ -103,7 +105,13 @@ void BeginEncrypt()
 
 	OutputFile.close();
 	InputFile.close();
+	#ifdef DEBUG 
+	
 
+	auto stop = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+	std::cout << duration.count() << std::endl;
+	#endif // 
 }
 void BeginDecrypt()
 {
@@ -113,11 +121,11 @@ void BeginDecrypt()
 	std::string Path;
 	do
 	{
-		std::cout << "Ok! Now drag and drop the file in here so i can encrypt it: ";
+		std::cout << "Ok! Now drag and drop the file in here so i can decrypt it (make sure its a .skappy file): ";
 		std::cin >> Path;
 	} while (!IsSkappyFile(Path));
 	std::string Key;
-	std::cout << "Now give me the password that you encrytped the file with: ";
+	std::cout << "Now give me the password that you encrypted the file with: ";
 	std::cin >> Key;
 	#endif
 
@@ -166,7 +174,7 @@ int main()
 			BeginEncrypt();
 			break;
 		case 2:
-			BeginDecrypt();
+			BeginDecrypt();	
 			break;
 		case 3:
 			return 0;
